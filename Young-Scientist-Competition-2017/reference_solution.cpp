@@ -1,0 +1,107 @@
+#include "stdio.h"
+#include "vector"
+#include "algorithm"
+#define matrix vector<vector<int> >
+#define super_matrix vector<vector<long long> >
+#define point pair<int,int>
+#define state pair<int,point>
+#define f first
+#define s second
+#define INF 1e8
+using namespace std;
+class vertex{
+    public:int z,r,X,T;
+    public:vector<int> R;
+};
+class object{
+    public:int b,d;
+};
+int donation_center,node[110],object_number,n,m;
+long long global_op=1e18,penalty;
+vector<object> o;
+matrix graph[100],all_shortest_path[101];
+super_matrix value(101);
+point ans[100],actual_ans[100];
+vertex sink[100][100];
+vector<state> donation;
+matrix graph_input(int x){
+    //input data for nodes in sub graph
+    scanf("%d",&node[x]);
+    for(int i=1;i<=node[x];i++){
+        scanf("%d %d %d",&sink[x][i].z,&sink[x][i].r,&m);
+        for(int j=1;j<=m+1;j++) scanf("%d",&n),sink[x][i].R.push_back(n);
+    }
+    //input number of nodes and edges in subgraph
+    matrix t(node[x]+1,vector<int>(node[x]+1));
+    for(int i=1;i<=node[x];i++){
+        for(int j=1;j<=node[x];j++){
+            scanf("%d",&t[i][j]);
+            if(t[i][j]==0&&i!=j) t[i][j]=INF;
+        }
+    }
+    return t;
+}
+void object_input(){
+    //input number of objects and their description
+    scanf("%d",&object_number);
+    vector<object> t(object_number+1);
+    for(int i=1;i<=object_number;i++) scanf("%d %d",&t[i].b,&t[i].d);
+    o=t;
+}
+matrix floyd_warshall(matrix d){
+    //floyd-warshall algorithm for calculate all pair shortest path
+    for(int k=1;k<d.size();k++){
+        for(int i=1;i<d.size();i++){
+            for(int j=1;j<d.size();j++) d[i][j]=min(d[i][j],d[i][k]+d[k][j]);
+        }
+    }
+    return d;
+}
+long long D(int i,int j,int t){
+    return value[i][j]=sink[i][j].z+sink[i][j].r*t;
+}
+long long square(long long x){
+    return x*x;
+}
+void evaluate(){
+    //calculate penalty for every decisions
+    for(int i=1;i<=donation_center;i++){
+        for(int j=1;j<=node[i];j++) value[i][j]=D(i,j,10000);
+    }
+    penalty=0;
+    for(int i=1;i<=donation_center;i++){
+        for(int j=1;j<=node[i];j++) penalty+=square(max(0LL,value[i][j]));
+    }
+    global_op=min(global_op,penalty);
+}
+int main(){
+    int temp,x,countx=0;
+    scanf("%d",&donation_center);
+    //input graph
+    for(int i=1;i<=donation_center;i++) graph[i]=graph_input(i);
+    //input connection between source nodes
+    graph[0]=matrix(donation_center+1,vector<int>(donation_center+1));
+    for(int i=1;i<=donation_center;i++){
+        for(int j=1;j<=donation_center;j++){
+            scanf("%d",&graph[0][i][j]);
+            if(graph[0][i][j]==0&&i!=j) graph[0][i][j]=INF;
+        }
+    }
+    object_input();
+    for(int i=0;i<=donation_center;i++) all_shortest_path[i]=floyd_warshall(graph[i]);
+    //input donations
+    while(scanf("%d",&temp)){
+        if(temp==-1) break;
+        countx++;
+        for(int i=1;i<=donation_center;i++){
+            for(int j=1;j<=object_number;j++){
+                scanf("%d",&x);
+                for(int l=0;l<x;l++) donation.push_back(state(countx,point(i,j)));
+            }
+        }
+    }
+    for(int i=1;i<=donation_center;i++) value[i]=vector<long long>(node[i]+1);
+    //find reference value
+    evaluate();
+    printf("%I64d",global_op);
+}
