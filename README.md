@@ -12,5 +12,3 @@ This version was presented in the [Young Scientist Competition](http://fic.necte
 * **Intel ISEF 2017**
 
 This version was presented at the [Intel International Science and Engineering Fair (Intel ISEF) 2017](https://www.societyforscience.org/isef/intel-isef-2017/). It features more flexible a mathematical model and adopts a Genetic Algorithm with variable chromosome length to find a good solution. The abstract is available [here](https://abstracts.societyforscience.org/Home/PrintPdf/8808).
-
-**[Presentation materials for Intel ISEF 2017 will be uploaded soon!]**
